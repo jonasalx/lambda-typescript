@@ -1,0 +1,102 @@
+#1  crear proyecto lambda (hello-world)
+
+sam init
+
+#2  TypeScript Dependency
+
+"scripts": {
+  "compile": "tsc"
+},
+"devDependencies": {
+  "aws-sdk": "^2.655.0",
+  "@types/aws-lambda": "^8.10.51",
+  "@types/node": "^13.13.5",
+  "typescript": "^3.8.3"
+}
+
+#3  tsconfig
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2017",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "outDir": "./built",
+    "sourceMap": true
+  },
+  "include": ["src-ts/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
+
+
+#4  crear directorio src-ts y mover app.js
+
+app.js
+exports.lambdaHandler = async (event, context) => {
+  const queries = JSON.stringify(event.queytStringParameters);
+  return {
+    statusCode: 200,
+    body: `Queries: ${queries}`
+  }
+};
+
+app.ts
+import { 
+  APIGatewayProxyEvent, 
+  APIGatewayProxyResult 
+} from "aws-lambda";
+export const lambdaHandler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  const queries = JSON.stringify(event.queryStringParameters);
+  return {
+    statusCode: 200,
+    body: `Queries: ${queries}`
+  }
+}
+
+#deberia estar algo asi
+
+├── README.md
+├── hello-world
+│   ├── built
+│   │   ├── app.js
+│   │   └── app.js.map
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src-ts
+│   │   ├── app.ts
+│   │   └── tests
+│   └── tsconfig.json
+├── samconfig.toml
+└── template.yaml
+
+#5 DEPLOY
+Para el deploy de deben indicar las credenciales aws
+https://docs.amazonaws.cn/en_us/serverless-application-model/latest/developerguide/serverless-getting-started-set-up-credentials.html
+
+en windows es facil con (desde cmd)
+set AWS_ACCESS_KEY_ID=your_access_key_id
+set AWS_SECRET_ACCESS_KEY=your_secret_access_key
+
+
+cd hello-world
+npm install
+npm run compile
+cd ..
+sam deploy --guided
+
+
+#6 Pruebas en local
+Debe estar instalado e iniciado docker (puede tardar al construir la imagen)
+
+sam local start-api
+
+
+#los primeros 5 pasos
+https://levelup.gitconnected.com/how-to-use-typescript-for-aws-lambda-in-3-steps-1996243547eb
+
+#de ayuda 
+#Implementación de una aplicación Hello World
+https://docs.aws.amazon.com/es_es/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html
+
